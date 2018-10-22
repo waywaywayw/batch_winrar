@@ -4,10 +4,8 @@
 @date: 2018/10/19
 """
 import os
-import zipfile
-import re
-import numpy as np
-import pandas as pd
+import time
+from atools_python.z7.z7 import z7_cmd
 
 need_path = os.path.join('D:\\', 'BaiduNetdiskDownload', 'SFC-PR')
 yuhold = 8
@@ -23,34 +21,59 @@ def is_rar(file):
     return False
 
 
+def folder_size(folder_path):
+    floder_size = 0
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            floder_size += os.path.getsize(os.path.join(root, file))
+    return floder_size
+
+
 def main():
     # 1.扫描指定路径下所有的压缩文件(rar, 7z, zip等)    [深入每个子目录, 不深入子目录]，获取所有压缩文件路径。
 
     need_files = []
     for root, dirs, files in os.walk(need_path, topdown=False):
         if root !=need_path and (len(dirs)+len(files))>=yuhold:
-            print('路径 {}, 共有文件夹 {} 个， 文件 {} 个。已跳过该文件夹'.format(root, len(dirs), len(files)))
+            # print('路径 {}, 共有文件夹 {} 个， 文件 {} 个。已跳过该文件夹'.format(root, len(dirs), len(files)))
             continue
         for name in files:
             if is_rar(name) and name not in filter_name:
                 print('>>>>>>>>>>>>>>>> 发现了压缩文件，路径：{}'.format(os.path.join(root, name)))
                 need_files.append(os.path.join(root, name))
-        # for name in dirs:
+        for name in dirs:
+            if name == '更多福利必读':
+                cmd = 'del {}'.format(os.path.join(root, name))
+                os.system(cmd)
+                print('删掉目录 ', os.path.join(root, name))
         #     print(os.path.join(root, name))
 
     # 2.将压缩文件就地解压到所在文件夹。（争取显示进度；如果解压错误，给出提示；）
-    for file in need_files:
-        z = zipfile.ZipFile(file, 'r')
-        file_no_suffix = file.split('.')[:-1]
-        rar_file = '.'.join(file_no_suffix)
-        print('开始解压文件：', file)
+    pwd = 'sifangclub.net'
+    for rar_file in need_files:
+        file_no_suffix = rar_file.split('.')[:-1]
+        output_path = '.'.join(file_no_suffix)
+        # 如果已解压过，并且大于1M。那么就不解压了
+        if os.path.exists(output_path):
+            output_path_size = folder_size(output_path)
+            rar_file_size = os.path.getsize(rar_file)
+            if output_path_size >= rar_file_size:    # （可选）
+                print('发现文件夹 {}，并且大于压缩文件。不再解压'.format(output_path))
+                cmd = 'del {}'.format(rar_file)
+                os.system(cmd)
+                print('删除原始压缩文件完毕')
+                continue
+                # break
         try:
-            z.extractall(path=rar_file, pwd=b'sifangclub.net')
-            print('解压成功~')
+            print('开始解压文件：', rar_file)
+            start_time = time.time()
+            z7_cmd(rar_file, output_path, pwd)
+            cost_time = time.time() - start_time
+            print('解压成功~ 耗时 {} 秒（{} 分钟）'.format(cost_time, cost_time/60))
         except Exception as e:
             print('解压失败！错误原因：')
             print(e)
-        z.close()
+        # z.close()
 
         # 3.验证（解压后的文件夹大小必须大于压缩文件大小！）并报告解压结果。
 
