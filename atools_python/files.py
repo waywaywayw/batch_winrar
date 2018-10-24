@@ -51,7 +51,7 @@ class MyFiles(object):
     def file_name_no_suffix(self):
         """返回不带路径不带后缀的完整文件名"""
         for file in self._fin_files:
-            yield '.'.join(file.split('.')[:-1])
+            yield file_no_suffix(file)
 
     def files_name_generator(self):
         """返回不带路径的完整文件名 的generator"""
@@ -68,6 +68,13 @@ def readlines_from_file(input_path, encoding='utf8'):
         for line in fin:
             ret_list.append(line.strip())
     return ret_list
+
+
+def file_no_suffix(file_path):
+    """返回去掉后缀名的文件名"""
+    file_no_suffix = file_path.split('.')[:-1]
+    output_path = '.'.join(file_no_suffix)
+    return output_path
 
 
 def legal_file_name(name):
