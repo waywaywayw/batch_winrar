@@ -7,6 +7,7 @@
 import os
 import re
 import sys
+import shutil
 import logging
 
 
@@ -51,7 +52,8 @@ class MyFiles(object):
     def file_name_no_suffix(self):
         """返回不带路径不带后缀的完整文件名"""
         for file in self._fin_files:
-            yield file_no_suffix(file)
+            fname, _ = os.path.splitext(file)
+            yield fname
 
     def files_name_generator(self):
         """返回不带路径的完整文件名 的generator"""
@@ -68,13 +70,6 @@ def readlines_from_file(input_path, encoding='utf8'):
         for line in fin:
             ret_list.append(line.strip())
     return ret_list
-
-
-def file_no_suffix(file_path):
-    """返回去掉后缀名的文件名"""
-    file_no_suffix = file_path.split('.')[:-1]
-    output_path = '.'.join(file_no_suffix)
-    return output_path
 
 
 def legal_file_name(name):
@@ -95,6 +90,24 @@ def legal_folder_name(name):
     while name.endswith('.'):
         name = name[:-1]
     return name
+
+
+def discard_duplicate_folder(folder_path):
+    """合并重复的文件夹（特定情况）"""
+    for root, dirs, files in os.walk(folder_path, topdown=False):
+        if len(dirs)==1 and len(files)==0 :
+            # 获取上层目录名
+            pre_dir = root.split('\\')[-1]
+            # 合并条件（上层目录名和本层目录名同名；上层目录只有一个文件夹）
+            if pre_dir == dirs[0]:
+                old_folder = os.path.join(root, dirs[0])
+                new_folder = root
+                for file in os.listdir(old_folder):
+                    shutil.move(os.path.join(old_folder, file), new_folder)
+                os.rmdir(old_folder)
+                print('已替换文件夹：', old_folder)
+
+
 
 
 class MyVocab(object):

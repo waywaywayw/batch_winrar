@@ -8,7 +8,7 @@ import time
 from atools_python.z7.z7 import z7_extract
 
 # need_path = os.path.join('D:\\', 'BaiduNetdiskDownload', 'SFC-PR')
-need_path = os.path.join('D:\\', 'BaiduNetdiskDownload', '小数点后面除了zip或者rar格式的其余多的都去掉不然看不了')
+need_path = os.path.join('D:\\', 'BaiduNetdiskDownload', '二次元狂热少女')
 yuhold = 8
 rar_suffix = ['rar', '7z', 'zip', 'tar']
 filter_name = ['更多福利.zip', '更多福利必读']

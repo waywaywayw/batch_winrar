@@ -11,8 +11,7 @@ import time
 from atools_python.files import readlines_from_file, file_no_suffix
 
 # 7z压缩软件的下载地址：https://www.7-zip.org/download.html
-# z7_path = os.path.join('atools_python', 'z7', '7z.exe')
-z7_path = os.path.join('7z.exe')
+z7_path = os.path.join('atools_python', 'z7', '7z.exe')
 
 
 def z7_extract_cmd(compressed_file_path, output_path, pwd=None, error_output=False):
@@ -85,9 +84,11 @@ def z7_try_pwd_list(compressed_file_path, output_path, pwd_list=(), verbose=Fals
 
 
 if __name__ == '__main__':
+    z7_path = os.path.join('7z.exe')
     input_path = os.path.join('D:\\', 'BaiduNetdiskDownload', '预览图带名字.zip')
     passwd_path = os.path.join('passwd.txt')
 
     pwds = readlines_from_file(passwd_path)
-    ret = z7_try_pwd_list(input_path, file_no_suffix(input_path), pwds)
+    input_path_no_suffix,_ = os.path.splitext(input_path)
+    ret = z7_try_pwd_list(input_path, input_path_no_suffix, pwds)
     print('解压命令执行情况:', ret)
